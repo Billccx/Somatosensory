@@ -2,9 +2,11 @@
 #define CALIBRATOR_H
 
 #include <QObject>
+#include <QMessageBox>
 #include <librealsense2/rs.hpp>
 #include <iostream>
 #include <vector>
+#include <string>
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
@@ -15,12 +17,34 @@
 #include <opencv2/calib3d/calib3d.hpp>
 #include <apriltag/apriltag_pose.h>
 
+extern "C" {
+#include "apriltag.h"
+#include "tag36h11.h"
+#include "tag25h9.h"
+#include "tag16h5.h"
+#include "tagCircle21h7.h"
+#include "tagCircle49h12.h"
+#include "tagCustom48h12.h"
+#include "tagStandard41h12.h"
+#include "tagStandard52h13.h"
+#include "common/getopt.h"
+}
+
 
 class Calibrator : public QObject
 {
     Q_OBJECT
+private:
+    rs2::context ctx;
+    rs2::align align_to_color;
+    std::vector<rs2::pipeline> pipelines;
+    std::vector<std::string> serials;
+    apriltag_family_t *tf;
+    apriltag_detector_t *td0,*td1;
+
 public:
     explicit Calibrator(QObject *parent = nullptr);
+    bool init();
 
 signals:
 
