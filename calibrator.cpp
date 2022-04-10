@@ -1,6 +1,7 @@
 #include "calibrator.h"
 
-Calibrator::Calibrator()
+Calibrator::Calibrator(QObject *parent)
+    : QObject{parent}
 {
 
 }
