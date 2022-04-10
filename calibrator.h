@@ -2,6 +2,7 @@
 #define CALIBRATOR_H
 
 #include <QObject>
+#include <QTimer>
 #include <QMessageBox>
 #include <librealsense2/rs.hpp>
 #include <iostream>
@@ -43,6 +44,8 @@ private:
     apriltag_family_t *tf;
     apriltag_detector_t *td0,*td1;
     bool isFirstInit;
+    cv::Mat merge;
+
 
 public:
     static cv::Mat frame_to_mat(const rs2::frame& f);
@@ -50,8 +53,10 @@ public:
     bool init();
     bool solve();
     bool release();
+    cv::Mat getMerge();
 
 signals:
+    void sendImage(QImage img);
 
 public slots:
 

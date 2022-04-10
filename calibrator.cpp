@@ -120,7 +120,7 @@ bool Calibrator::solve(){
         rs2::frameset fs0, fs1;
         fs0 = pipelines[0].wait_for_frames();
         fs1 = pipelines[1].wait_for_frames();
-        std::cout<<"wait frames"<<std::endl;
+        //std::cout<<"wait frames"<<std::endl;
 
         //rs2::frameset aligned0 = align_to_color.process(fs0);
         rs2::frameset aligned1 = align_to_color.process(fs1);
@@ -153,12 +153,12 @@ bool Calibrator::solve(){
             .buf = gray1.data
         };
 
-        std::cout<<"aligned"<<std::endl;
+        //std::cout<<"aligned"<<std::endl;
 
         zarray_t *detections0 = apriltag_detector_detect(td0, &im0);
         zarray_t *detections1 = apriltag_detector_detect(td1, &im1);
 
-        std::cout<<"detected"<<std::endl;
+        //std::cout<<"detected"<<std::endl;
 
         std::vector<cv::Point3f> objectPoints;
         std::vector<cv::Point2f> imagePoints;
@@ -305,15 +305,26 @@ bool Calibrator::solve(){
             std::cout<<std::endl<<std::endl<<std::endl;
         }
 
-        cv::Mat merge;
-        hconcat(frame0,frame1,merge);
+        //cv::Mat merge;
+        hconcat(frame0,frame1,this->merge);
+        std::cout<<"captured frame"<<std::endl;
 
-        imshow("Tag Detections", merge);
-        std::cout<<"show"<<std::endl;
-        if (isFind || cv::waitKey(30) >= 0){
-            cv::destroyWindow("Tag Detections");
-            break;
-        }
+        //imshow("Tag Detections", merge);
+
+        cv::cvtColor(merge,merge,cv::COLOR_BGR2RGB);
+        qApp->processEvents();
+        //QImage disImage=QImage((const unsigned char*)(merge.data),merge.cols,merge.rows,QImage::Format_RGB888);
+        //std::cout<<"in solve is disImage null? "<<disImage.isNull()<<std::endl;
+
+
+        //std::cout<<"show"<<std::endl;
+
+//        if (isFind || cv::waitKey(30) >= 0){
+//            cv::destroyWindow("Tag Detections");
+//            break;
+//        }
+
+        if(isFind) break;
     }
     return true;
 }
@@ -331,5 +342,9 @@ bool Calibrator::release(){
     return true;
 }
 
+
+cv::Mat Calibrator::getMerge(){
+    return this->merge;
+}
 
 
