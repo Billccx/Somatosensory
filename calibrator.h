@@ -39,12 +39,17 @@ private:
     rs2::align align_to_color;
     std::vector<rs2::pipeline> pipelines;
     std::vector<std::string> serials;
+    std::vector<rs2_intrinsics> intrins;
     apriltag_family_t *tf;
     apriltag_detector_t *td0,*td1;
+    bool isFirstInit;
 
 public:
+    static cv::Mat frame_to_mat(const rs2::frame& f);
     explicit Calibrator(QObject *parent = nullptr);
     bool init();
+    bool solve();
+    bool release();
 
 signals:
 
