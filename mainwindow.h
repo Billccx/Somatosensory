@@ -19,6 +19,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void updateImageLabel();
+    void updateImageLabel2(QImage disImage);
 
 private slots:
     void on_pushButton_clicked();

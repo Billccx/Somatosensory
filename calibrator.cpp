@@ -312,9 +312,11 @@ bool Calibrator::solve(){
         //imshow("Tag Detections", merge);
 
         cv::cvtColor(merge,merge,cv::COLOR_BGR2RGB);
-        qApp->processEvents();
-        //QImage disImage=QImage((const unsigned char*)(merge.data),merge.cols,merge.rows,QImage::Format_RGB888);
-        //std::cout<<"in solve is disImage null? "<<disImage.isNull()<<std::endl;
+        cv::resize(merge,merge,cv::Size(merge.cols*0.8, merge.rows*0.8), 0, 0,cv::INTER_NEAREST);
+
+        QImage disImage=QImage((const unsigned char*)(merge.data),merge.cols,merge.rows,QImage::Format_RGB888);
+        std::cout<<"in solve is disImage null? "<<disImage.isNull()<<std::endl;
+        emit sendImage(disImage);
 
 
         //std::cout<<"show"<<std::endl;
