@@ -3,7 +3,12 @@
 PoseTracker::PoseTracker(QObject *parent)
     : QObject{parent},align_to_color(RS2_STREAM_COLOR)
 {
+    shouldRun=false;
+}
 
+
+void PoseTracker::setshouldRun(bool x){
+    this->shouldRun=x;
 }
 
 bool PoseTracker::init(const std::string graphPath){
@@ -38,12 +43,31 @@ bool PoseTracker::init(const std::string graphPath){
 
 
 
-bool PoseTracker::solve(rs2::frameset fs0,rs2::frameset fs1){
+bool PoseTracker::solve(){
     cv::Mat result;
-    result=ptracker->Process(fs0,fs1);
-    if(!result.data){
-        std::cout<<"[error] the output frame is empty"<<std::endl;
+
+    while(this->shouldRun){
+        rs2::frameset fs0, fs1;
+        fs0 = pipelines[0].wait_for_frames();
+        fs1 = pipelines[1].wait_for_frames();
+        result=ptracker->Process(fs0,fs1);
+        if(!result.data){
+            std::cout<<"[error] the output frame is empty"<<std::endl;
+            return false;
+        }
     }
+
+    return true;
+}
+
+
+bool PoseTracker::release(){
+    for(auto&& item : pipelines){
+        item.stop();
+    }
+    pipelines.clear();
+    serials.clear();
+    return true;
 }
 
 

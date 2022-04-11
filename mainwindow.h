@@ -5,7 +5,8 @@
 #include <QLabel>
 #include <QImage>
 #include <QTimer>
-#include <calibrator.h>
+#include "calibrator.h"
+#include "posetracker.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,11 +25,16 @@ public:
 private slots:
     void on_pushButton_clicked();
 
+    void on_pushButton_2_clicked();
+
+    void on_pushButton_3_clicked();
+
 private:
     Ui::MainWindow *ui;
     Calibrator clb;
     cv::Mat img;
     QTimer updateTimer;
+    PoseTracker pst;
 
 };
 #endif // MAINWINDOW_H

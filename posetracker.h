@@ -13,6 +13,7 @@ class PoseTracker : public QObject
     Q_OBJECT
 private:
     QSharedPointer<mediapipe::Pose> ptracker;
+    bool shouldRun;
 
 
 public:
@@ -23,7 +24,9 @@ public:
 
     explicit PoseTracker(QObject *parent = nullptr);
     bool init(const std::string graphPath);
-    bool solve(rs2::frameset fs0,rs2::frameset fs1);
+    bool solve();
+    bool release();
+    void setshouldRun(bool x);
 
 
 signals:

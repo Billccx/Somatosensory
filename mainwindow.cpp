@@ -62,3 +62,25 @@ void MainWindow::updateImageLabel2(QImage disImage){
     return;
 }
 
+
+//start tracking button
+void MainWindow::on_pushButton_2_clicked()
+{
+    const std::string graphPath="/home/cuichenxi/code/Qt/qmakeProj/calculatorgraph/1.pbtxt";
+    bool isInit=this->pst.init(graphPath);
+    if(!isInit){
+        QMessageBox::warning(this, "Attention!","No Realsense device detected. Is it plugged in?");
+        return;
+    }
+    this->pst.setshouldRun(true);
+    this->pst.solve();
+}
+
+
+//stop tracking button
+void MainWindow::on_pushButton_3_clicked()
+{
+    this->pst.setshouldRun(false);
+    this->pst.release();
+}
+
