@@ -10,12 +10,14 @@ CONFIG += c++17
 
 SOURCES += \
     calibrator.cpp \
+    capturer.cpp \
     main.cpp \
     mainwindow.cpp \
     posetracker.cpp
 
 HEADERS += \
     calibrator.h \
+    capturer.h \
     mainwindow.h \
     posetracker.h
 
