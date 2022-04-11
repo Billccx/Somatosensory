@@ -2,9 +2,15 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QPushButton>
+#include <opencv2/opencv.hpp>
+#include <iostream>
 
 int main(int argc, char *argv[])
 {
+    cv::Mat t=cv::Mat();
+    if(!t.data){
+        std::cout<<"mat is empty"<<std::endl;
+    }
     QApplication a(argc, argv);
     MainWindow w;
     w.show();
