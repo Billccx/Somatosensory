@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSharedPointer>
+#include <QImage>
 #include <pose.h>
 #include <string>
 #include <librealsense2/rs.hpp>
@@ -30,6 +31,7 @@ public:
 
 
 signals:
+    void sendImage(QImage img);
 
 };
 

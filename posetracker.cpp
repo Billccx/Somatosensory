@@ -4,6 +4,7 @@ PoseTracker::PoseTracker(QObject *parent)
     : QObject{parent},align_to_color(RS2_STREAM_COLOR)
 {
     shouldRun=false;
+
 }
 
 
@@ -12,8 +13,8 @@ void PoseTracker::setshouldRun(bool x){
 }
 
 bool PoseTracker::init(const std::string graphPath){
-    ptracker=QSharedPointer<mediapipe::Pose>(mediapipe::Pose::Create(graphPath));
 
+    ptracker=QSharedPointer<mediapipe::Pose>(mediapipe::Pose::Create(graphPath));
     auto list = ctx.query_devices();
     if (list.size() == 0){
         throw std::runtime_error("No device detected. Is it plugged in?");
@@ -44,9 +45,10 @@ bool PoseTracker::init(const std::string graphPath){
 
 
 bool PoseTracker::solve(){
-    cv::Mat result;
+
 
     while(this->shouldRun){
+        cv::Mat result;
         rs2::frameset fs0, fs1;
         fs0 = pipelines[0].wait_for_frames();
         fs1 = pipelines[1].wait_for_frames();
@@ -54,6 +56,18 @@ bool PoseTracker::solve(){
         if(!result.data){
             std::cout<<"[error] the output frame is empty"<<std::endl;
             return false;
+        }
+
+        //cv::cvtColor(result,result,cv::COLOR_BGR2RGB);
+        //cv::resize(result,result,cv::Size(result.cols*0.8, result.rows*0.8), 0, 0,cv::INTER_NEAREST);
+
+        //QImage disImage=QImage((const unsigned char*)(result.data),result.cols,result.rows,QImage::Format_RGB888);
+        //std::cout<<"in solve is disImage null? "<<disImage.isNull()<<std::endl;
+        //emit sendImage(disImage);
+        cv::imshow("pose", result);
+        if (!shouldRun || cv::waitKey(30) >= 0){
+            cv::destroyWindow("Tag Detections");
+            break;
         }
     }
 

@@ -21,6 +21,7 @@ public:
     ~MainWindow();
     void updateImageLabel();
     void updateImageLabel2(QImage disImage);
+    void updateImageLabel3(QImage disImage); //show 2d landmarks
 
 private slots:
     void on_pushButton_clicked();

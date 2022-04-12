@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->updateTimer.setInterval(30);
     //connect(&this->updateTimer,&QTimer::timeout,this,&MainWindow::updateImageLabel);
     connect(&this->clb,&Calibrator::sendImage,this,&MainWindow::updateImageLabel2);
+    connect(&this->pst,&PoseTracker::sendImage,this,&MainWindow::updateImageLabel3);
 }
 
 MainWindow::~MainWindow()
@@ -82,5 +83,14 @@ void MainWindow::on_pushButton_3_clicked()
 {
     this->pst.setshouldRun(false);
     this->pst.release();
+}
+
+
+void MainWindow::updateImageLabel3(QImage disImage){
+    //cv::cvtColor(img,img,cv::COLOR_BGR2RGB);
+    std::cout<<"is Image null? "<<disImage.isNull()<<std::endl;
+    ui->label->setPixmap(QPixmap::fromImage(disImage));
+    qApp->processEvents();
+    return;
 }
 
