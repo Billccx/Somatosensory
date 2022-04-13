@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QSharedPointer>
 #include <QImage>
+#include <QThread>
 #include <pose.h>
 #include <string>
 #include <librealsense2/rs.hpp>

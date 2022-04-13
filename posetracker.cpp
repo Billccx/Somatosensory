@@ -43,7 +43,7 @@ bool PoseTracker::init(const std::string graphPath){
 }
 
 
-
+/*
 bool PoseTracker::solve(){
 
 
@@ -69,6 +69,20 @@ bool PoseTracker::solve(){
             cv::destroyWindow("Tag Detections");
             break;
         }
+    }
+
+    return true;
+}
+*/
+
+bool PoseTracker::solve(){
+
+    while(this->shouldRun){
+        cv::Mat result;
+        rs2::frameset fs0, fs1;
+        fs0 = pipelines[0].wait_for_frames();
+        fs1 = pipelines[1].wait_for_frames();
+        ptracker->Process(fs0,fs1);
     }
 
     return true;

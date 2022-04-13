@@ -56,7 +56,7 @@ public:
     cv::Mat getMerge();
 
 signals:
-    void sendImage(QImage img);
+    //void sendImage(QImage img);
 
 public slots:
 

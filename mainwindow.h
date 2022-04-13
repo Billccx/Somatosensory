@@ -5,6 +5,8 @@
 #include <QLabel>
 #include <QImage>
 #include <QTimer>
+#include <cstdlib>
+#include <QThread>
 #include "calibrator.h"
 #include "posetracker.h"
 
@@ -23,6 +25,9 @@ public:
     void updateImageLabel2(QImage disImage);
     void updateImageLabel3(QImage disImage); //show 2d landmarks
 
+signals:
+    void sendStartcmd();
+
 private slots:
     void on_pushButton_clicked();
 
@@ -30,12 +35,17 @@ private slots:
 
     void on_pushButton_3_clicked();
 
+    void on_pushButton_4_clicked();
+
+    void on_pushButton_5_clicked();
+
 private:
     Ui::MainWindow *ui;
     Calibrator clb;
     cv::Mat img;
     QTimer updateTimer;
-    PoseTracker pst;
+    QThread pstThread;
+    PoseTracker* pst;
 
 };
 #endif // MAINWINDOW_H

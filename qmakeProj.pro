@@ -13,13 +13,15 @@ SOURCES += \
     capturer.cpp \
     main.cpp \
     mainwindow.cpp \
-    posetracker.cpp
+    posetracker.cpp \
+    posetracker2.cpp
 
 HEADERS += \
     calibrator.h \
     capturer.h \
     mainwindow.h \
-    posetracker.h
+    posetracker.h \
+    posetracker2.h
 
 FORMS += \
     mainwindow.ui
