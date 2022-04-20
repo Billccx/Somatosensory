@@ -55,7 +55,7 @@ bool Calibrator::init(){
         rs2::pipeline pipe(ctx);
         rs2::config cfg;
         cfg.enable_device(serial);
-        if(cnt) cfg.enable_stream(rs2_stream::RS2_STREAM_DEPTH, 640, 480, rs2_format::RS2_FORMAT_Z16);
+        if(!cnt) cfg.enable_stream(rs2_stream::RS2_STREAM_DEPTH, 640, 480, rs2_format::RS2_FORMAT_Z16);
         cfg.enable_stream(rs2_stream::RS2_STREAM_COLOR, 640, 480, rs2_format::RS2_FORMAT_RGB8);
         pipe.start(cfg);
         pipelines.emplace_back(pipe);
@@ -107,10 +107,16 @@ cv::Mat Calibrator::frame_to_mat(const rs2::frame& f){
 
 bool Calibrator::solve(){
     cv::Mat gray0,gray1;
-    double cm0[9]= {600.764,         0,   331.948,
-                          0,   600.986,   248.697,
-                          0,         0,         1 };
+    double cm0[9]= {600.764,       0, 331.948,
+                          0, 600.986, 248.697,
+                          0,       0,       1 };
+
+    double cm1[9]= {601.325,       0, 333.593,
+                          0, 601.453, 244.954,
+                          0,       0,       1 };
+
     cv::Mat cameraMatrix0 (3, 3, CV_64F, cm0);
+    cv::Mat cameraMatrix1 (3, 3, CV_64F, cm1);
 
 
     bool isFind=false;
@@ -122,13 +128,11 @@ bool Calibrator::solve(){
         fs1 = pipelines[1].wait_for_frames();
         //std::cout<<"wait frames"<<std::endl;
 
-        //rs2::frameset aligned0 = align_to_color.process(fs0);
-        rs2::frameset aligned1 = align_to_color.process(fs1);
+        rs2::frameset aligned0 = align_to_color.process(fs0);
 
-
-        rs2::video_frame color0=fs0.get_color_frame();
-        rs2::video_frame color1=aligned1.get_color_frame();
-        rs2::depth_frame depth1=aligned1.get_depth_frame();
+        rs2::video_frame color0=aligned0.get_color_frame();
+        rs2::depth_frame depth0=aligned0.get_depth_frame();
+        rs2::video_frame color1=fs1.get_color_frame();
 
         // rs2::video_frame color0=fs0.get_color_frame();
         // rs2::video_frame color1=fs1.get_color_frame();
@@ -166,13 +170,13 @@ bool Calibrator::solve(){
         cv::Mat r, t, R;
 
         // Draw detection outlines
-        for (int i = 0; i < zarray_size(detections0); i++) {
+        for (int i = 0; i < zarray_size(detections1); i++) {
             apriltag_detection_t *det;
-            zarray_get(detections0, i, &det);
-            line(frame0, cv::Point(det->p[0][0], det->p[0][1]),cv::Point(det->p[1][0], det->p[1][1]),cv::Scalar(0, 0xff, 0), 2);
-            line(frame0, cv::Point(det->p[0][0], det->p[0][1]),cv::Point(det->p[3][0], det->p[3][1]),cv::Scalar(0, 0, 0xff), 2);
-            line(frame0, cv::Point(det->p[1][0], det->p[1][1]),cv::Point(det->p[2][0], det->p[2][1]),cv::Scalar(0xff, 0, 0), 2);
-            line(frame0, cv::Point(det->p[2][0], det->p[2][1]),cv::Point(det->p[3][0], det->p[3][1]),cv::Scalar(0xff, 0, 0), 2);
+            zarray_get(detections1, i, &det);
+            line(frame1, cv::Point(det->p[0][0], det->p[0][1]),cv::Point(det->p[1][0], det->p[1][1]),cv::Scalar(0, 0xff, 0), 2);
+            line(frame1, cv::Point(det->p[0][0], det->p[0][1]),cv::Point(det->p[3][0], det->p[3][1]),cv::Scalar(0, 0, 0xff), 2);
+            line(frame1, cv::Point(det->p[1][0], det->p[1][1]),cv::Point(det->p[2][0], det->p[2][1]),cv::Scalar(0xff, 0, 0), 2);
+            line(frame1, cv::Point(det->p[2][0], det->p[2][1]),cv::Point(det->p[3][0], det->p[3][1]),cv::Scalar(0xff, 0, 0), 2);
 
             imagePoints.push_back(cv::Point2f(det->p[0][0], det->p[0][1]));
             imagePoints.push_back(cv::Point2f(det->p[1][0], det->p[1][1]));
@@ -186,28 +190,28 @@ bool Calibrator::solve(){
             double fontscale = 1.0;
             int baseline;
             cv::Size textsize = getTextSize(text, fontface, fontscale, 2,&baseline);
-            putText(frame0, text,
+            putText(frame1, text,
             cv::Point(det->c[0]-textsize.width/2,det->c[1]+textsize.height/2),
             fontface, fontscale, cv::Scalar(0xff, 0x99, 0), 2);
         }
-        apriltag_detections_destroy(detections0);
+        apriltag_detections_destroy(detections1);
 
 
 
-        for (int i = 0; i < zarray_size(detections1); i++) {
+        for (int i = 0; i < zarray_size(detections0); i++) {
             apriltag_detection_t *det;
-            zarray_get(detections1, i, &det);
-            line(frame1, cv::Point(det->p[0][0], det->p[0][1]),cv::Point(det->p[1][0], det->p[1][1]),cv::Scalar(0, 0xff, 0), 2);
-            line(frame1, cv::Point(det->p[0][0], det->p[0][1]),cv::Point(det->p[3][0], det->p[3][1]),cv::Scalar(0, 0, 0xff), 2);
-            line(frame1, cv::Point(det->p[1][0], det->p[1][1]),cv::Point(det->p[2][0], det->p[2][1]),cv::Scalar(0xff, 0, 0), 2);
-            line(frame1, cv::Point(det->p[2][0], det->p[2][1]),cv::Point(det->p[3][0], det->p[3][1]),cv::Scalar(0xff, 0, 0), 2);
+            zarray_get(detections0, i, &det);
+            line(frame0, cv::Point(det->p[0][0], det->p[0][1]),cv::Point(det->p[1][0], det->p[1][1]),cv::Scalar(0, 0xff, 0), 2);
+            line(frame0, cv::Point(det->p[0][0], det->p[0][1]),cv::Point(det->p[3][0], det->p[3][1]),cv::Scalar(0, 0, 0xff), 2);
+            line(frame0, cv::Point(det->p[1][0], det->p[1][1]),cv::Point(det->p[2][0], det->p[2][1]),cv::Scalar(0xff, 0, 0), 2);
+            line(frame0, cv::Point(det->p[2][0], det->p[2][1]),cv::Point(det->p[3][0], det->p[3][1]),cv::Scalar(0xff, 0, 0), 2);
 
 
             for(int j=0;j<4;j++){
                 float point3d[3]={0,0,0};
                 float point2d[2]={(float)det->p[j][0],(float)det->p[j][1]};
                 //cout<<"pixel:("<<(int)det->p[i][0]<<','<<(int)det->p[i][1]<<")\n";
-                float depth=depth1.get_distance((int)det->p[j][0],(int)det->p[j][1]);
+                float depth=depth0.get_distance((int)det->p[j][0],(int)det->p[j][1]);
 
                 if(depth==0){
                     objectPoints.clear();
@@ -227,7 +231,7 @@ bool Calibrator::solve(){
             int baseline;
             cv::Size textsize = getTextSize(text, fontface, fontscale, 2,&baseline);
             putText(
-                    frame1,
+                    frame0,
                     text,
                     cv::Point(det->c[0]-textsize.width/2,det->c[1]+textsize.height/2),
                     fontface,
@@ -236,7 +240,7 @@ bool Calibrator::solve(){
                     2
                     );
         }
-        apriltag_detections_destroy(detections1);
+        apriltag_detections_destroy(detections0);
 
 
         if(objectPoints.size()==4 && imagePoints.size()==4){
@@ -248,7 +252,7 @@ bool Calibrator::solve(){
                 r,
                 t,
                 false,
-                cv::SOLVEPNP_P3P
+                cv::SOLVEPNP_ITERATIVE
             );
             std::cout<<"3d:"<<std::endl;
             for(int i=0;i<4;i++){
